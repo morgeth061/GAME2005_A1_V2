@@ -21,13 +21,17 @@ public:
 
 	void setIsMoving(bool moving);
 
-	void setAngleDegrees(int val);
+	void setAngleDegrees(float val);
 
 	void setInitVelocity(float val);
 
 	void setPosition(glm::vec2 pos);
 
 	glm::vec2 getPosition();
+
+	void setRampLength(float length);
+
+	void setRampHeight(float height);
 
 	// getters
 
@@ -44,6 +48,8 @@ private:
 
 	int angleDegrees;
 	float initVelocity;
+	float rampLength;
+	float rampHeight;
 
 	int frameCount = 1;
 	bool isMoving = false;

@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
+#include "Ramp.h"
 
 class PlayScene : public Scene
 {
@@ -22,14 +23,22 @@ public:
 	virtual void start() override;
 private:
 	// IMGUI Function
-	void GUI_Function() const;
+	void GUI_Function();
 	std::string m_guiTitle;
 	
 	glm::vec2 m_mousePosition;
 
 	Plane* m_pPlaneSprite;
 	Player* m_pPlayer;
+	Ramp* m_pRamp;
 	bool m_playerFacingRight;
+
+	//Ramp
+	glm::vec2 m_pRampHeight = glm::vec2(90, 665);
+	glm::vec2 m_pRampLength = glm::vec2(210, 725);
+	glm::vec2 m_pRampOrigin = glm::vec2(90, 725);
+
+	float m_pRampAngle = 36.0f;
 
 	// UI Items
 	Button* m_pBackButton;

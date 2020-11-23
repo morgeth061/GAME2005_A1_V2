@@ -3,7 +3,7 @@
 
 Player::Player()
 {
-	
+
 	TextureManager::Instance()->load("../Assets/Textures/Detonator.png", "detonator");
 
 	// set frame width
@@ -12,10 +12,10 @@ Player::Player()
 	// set frame height
 	setHeight(58);
 
-	angleDegrees = 75; //Angle of initial ascent, in degrees
-	initVelocity = 95; //Initial speed of projectile, in m/s
+	//angleDegrees = 75; //Angle of initial ascent, in degrees		// Should be equal to ramp angle
+	initVelocity = 0; //Initial speed of projectile, in m/s		// Should be 0, and increase as it descends the ramp, then decrease against the floor
 
-	getTransform()->position = glm::vec2(100.0f, 675.0f);
+	getTransform()->position = glm::vec2(90.0f, 620.0f);
 	getRigidBody()->velocity = glm::vec2(0.0f, 0.0f);
 	getRigidBody()->acceleration = glm::vec2(0.0f, 0.0f);
 	getRigidBody()->isColliding = false;
@@ -37,25 +37,49 @@ void Player::draw()
 void Player::update()
 {
 
-	frameCount++;
-
-	if (frameCount == 4)
+	if(isMoving == true)
 	{
-		frameCount = 1;
-
-		if (getTransform()->position.y + getRigidBody()->velocity.y <= 675.0f)
+		frameCount++;
+		if (frameCount == 4)
 		{
-			getTransform()->position = getTransform()->position + getRigidBody()->velocity;
+			frameCount = 1;
 
-			getRigidBody()->velocity = getRigidBody()->velocity + getRigidBody()->acceleration;
+			//getTransform()->position = getTransform()->position + getRigidBody()->velocity;
 
-			std::cout << getTransform()->position.y << std::endl;
-		}
-		else
-		{
-			getTransform()->position.y = 700;
+			//getRigidBody()->velocity = glm::vec2(sqrt(2 * 9.81 * ((getTransform()->position.y - 90) / 30)) * cos(angleDegrees * (3.14 / 180)), sqrt(2 * 9.81 * ((getTransform()->position.y - 90) / 30)) * sin(angleDegrees * (3.14 / 180)));
+
+			if (((getTransform()->position.y - 725) / 30) < -2)
+			{
+				getTransform()->position = getTransform()->position + getRigidBody()->velocity;
+				getRigidBody()->velocity = glm::vec2(sqrt(2 * 9.81 * ((getTransform()->position.y - 90) / 30)) * cos(angleDegrees * (3.14 / 180)), sqrt(2 * 9.81 * ((getTransform()->position.y - 90) / 30)) * sin(angleDegrees * (3.14 / 180)));
+			}
+			else
+			{
+				getRigidBody()->acceleration = glm::vec2(-0.548, 0);
+				getRigidBody()->velocity = glm::vec2(getRigidBody()->velocity.x + getRigidBody()->acceleration.x, 0);
+				if(getRigidBody()->velocity.x > 0)
+				{
+					getTransform()->position = getTransform()->position + getRigidBody()->velocity;
+				}
+				else
+				{
+					getRigidBody()->velocity = glm::vec2(0, 0);
+				}
+			}
+
+			std::cout << ((getTransform()->position.y - 725) / 30) << rampHeight << std::endl;
+
+			
+
+			//getRigidBody()->velocity = getRigidBody()->velocity + getRigidBody()->acceleration;
+
+			// Guessing this is the math? if so should be changed so the ball moves down the ramp with acceleration.
+			// Once it reaches the same displacement as the length of the ramps hyp it should change
+			// Should travel straight against the ground and decelerate according to friction with the floor
 		}
 	}
+	
+	
 
 
 }
@@ -69,9 +93,10 @@ void Player::setIsMoving(bool moving)
 	isMoving = moving;
 }
 
-void Player::setAngleDegrees(int val)
+void Player::setAngleDegrees(float val)
 {
-	if(0 <= val <= 90)
+	// Should be used to set angle to angle of ramp then when reaches floor
+	if (0 <= val <= 90)
 	{
 		angleDegrees = val;
 	}
@@ -79,7 +104,7 @@ void Player::setAngleDegrees(int val)
 
 void Player::setInitVelocity(float val)
 {
-	if(val >= 0)
+	if (val >= 0)
 	{
 		initVelocity = val;
 	}
@@ -95,6 +120,16 @@ glm::vec2 Player::getPosition()
 	return getTransform()->position;
 }
 
+void Player::setRampLength(float length)
+{
+	rampLength = length;
+}
+
+void Player::setRampHeight(float height)
+{
+	rampHeight = height;
+}
+
 int Player::getAngleDegrees()
 {
 	return angleDegrees;
@@ -107,7 +142,7 @@ int Player::getInitVelocity()
 
 void Player::reset()
 {
-	getTransform()->position = glm::vec2(100, 675);
-	getRigidBody()->velocity = glm::vec2(initVelocity * cos(angleDegrees * (3.14 / 180)), -initVelocity * sin(angleDegrees * (3.14 / 180)));
-	getRigidBody()->acceleration = glm::vec2(0, 9.8);
+	getTransform()->position = glm::vec2(glm::vec2(100.0f, ((rampHeight * -30) + 700)));
+	getRigidBody()->velocity = glm::vec2(0,0);
+	//getRigidBody()->acceleration = glm::vec2(0, 9.8);
 }
